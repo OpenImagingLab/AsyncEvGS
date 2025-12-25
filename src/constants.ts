@@ -22,7 +22,7 @@ export const RESEARCH_DATA: ProjectData = {
   ],
   heroVideoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Replace with your project's teaser video URL
   methodDescription: "This section describes your proposed method. Explain the architecture, the loss functions, and the training pipeline. You can mention the specific modules (e.g., Diffusion Transformer, Gaussian Splatting Renderer) and how they interact. Replace the image URL below with your actual pipeline diagram.",
-  methodImageUrl: "https://picsum.photos/seed/method/800/400", // Replace with your pipeline diagram URL
+  methodImageUrl: "./assets/pipeline_v7.png", // Replace with your pipeline diagram URL
   comparisons: [
     {
       id: "c1",
