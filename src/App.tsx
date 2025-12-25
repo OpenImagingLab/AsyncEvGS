@@ -175,7 +175,7 @@ const ChatWidget: React.FC = () => {
       `;
       
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-1.5-flash',
         contents: [
           { role: 'user', parts: [{ text: context }] }, // System context as first turn or merged
           ...messages.map(m => ({ role: m.role, parts: [{ text: m.text }] })),

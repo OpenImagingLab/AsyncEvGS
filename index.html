@@ -32,6 +32,27 @@
           scrollbar-width: none;
       }
     </style>
+    <script>
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
+        var message = [
+          'Message: ' + msg,
+          'URL: ' + url,
+          'Line: ' + lineNo,
+          'Column: ' + columnNo,
+          'Error object: ' + JSON.stringify(error)
+        ].join(' - ');
+        console.log(message);
+        var el = document.createElement('div');
+        el.style.color = 'red';
+        el.style.position = 'fixed';
+        el.style.top = '0';
+        el.style.background = 'white';
+        el.style.zIndex = '9999';
+        el.innerText = 'Error: ' + message;
+        document.body.appendChild(el);
+        return false;
+      };
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased">
     <div id="root"></div>
