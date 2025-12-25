@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { RESEARCH_DATA } from './constants';
 import type { MetricPoint, ComparisonItem, ChatMessage } from './types';
 
@@ -352,9 +356,14 @@ function App() {
         {/* Abstract */}
         <section id="abstract" className="mb-20">
           <h2 className="font-serif text-3xl font-semibold mb-6 text-slate-900">Abstract</h2>
-          <p className="text-lg leading-relaxed text-slate-600 text-justify">
-            {abstract}
-          </p>
+          <div className="text-lg leading-relaxed text-slate-600 text-justify markdown-content">
+            <ReactMarkdown 
+              remarkPlugins={[remarkMath]} 
+              rehypePlugins={[rehypeKatex]}
+            >
+              {abstract}
+            </ReactMarkdown>
+          </div>
         </section>
 
         <hr className="border-slate-200 mb-20" />
@@ -368,9 +377,14 @@ function App() {
               alt="Method Diagram" 
               className="w-full h-auto rounded-lg shadow-sm mb-6"
             />
-            <p className="text-slate-700 leading-relaxed">
-              {methodDescription}
-            </p>
+            <div className="text-slate-700 leading-relaxed markdown-content">
+              <ReactMarkdown 
+                remarkPlugins={[remarkMath]} 
+                rehypePlugins={[rehypeKatex]}
+              >
+                {methodDescription}
+              </ReactMarkdown>
+            </div>
           </div>
         </section>
 

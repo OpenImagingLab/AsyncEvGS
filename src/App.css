@@ -40,3 +40,16 @@
 .read-the-docs {
   color: #888;
 }
+
+.markdown-content p {
+  margin-bottom: 1rem;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #0f172a;
+}
