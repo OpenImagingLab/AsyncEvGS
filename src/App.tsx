@@ -556,7 +556,7 @@ function App() {
         {/* Qualitative Comparisons */}
         <section className="mb-20">
           <h2 className="font-serif text-3xl font-semibold mb-8 text-slate-900">Qualitative Comparisons</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-10">
             {/* Real-world comparison */}
             <div>
               <img 
