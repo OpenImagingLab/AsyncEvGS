@@ -558,31 +558,23 @@ function App() {
           <h2 className="font-serif text-3xl font-semibold mb-8 text-slate-900">Qualitative Comparisons</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Real-world comparison */}
-            <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-              <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  src={realWorldPatio} 
-                  alt="Comparison on real-world data" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4 text-center">
-                <p className="text-sm font-medium text-slate-700">Comparison on real-world data</p>
-              </div>
+            <div>
+              <img 
+                src={realWorldPatio} 
+                alt="Comparison on real-world data" 
+                className="w-full h-auto rounded-lg shadow-md"
+              />
+              <p className="text-sm font-medium text-slate-700 text-center mt-3">Comparison on real-world data</p>
             </div>
 
             {/* Synthetic comparison */}
-            <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-              <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  src={syntheticTrollet} 
-                  alt="Comparison on synthetic data" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4 text-center">
-                <p className="text-sm font-medium text-slate-700">Comparison on synthetic data</p>
-              </div>
+            <div>
+              <img 
+                src={syntheticTrollet} 
+                alt="Comparison on synthetic data" 
+                className="w-full h-auto rounded-lg shadow-md"
+              />
+              <p className="text-sm font-medium text-slate-700 text-center mt-3">Comparison on synthetic data</p>
             </div>
           </div>
         </section>
