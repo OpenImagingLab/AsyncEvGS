@@ -1,6 +1,16 @@
 import type { ProjectData } from './types';
 import pipelineImg from './assets/pipeline_v7.png';
 
+// Import videos
+import loungeBaseline from './assets/interactive_results/real-world/Lounge/LSENeRF.mp4';
+import loungeOurs from './assets/interactive_results/real-world/Lounge/Ours.mp4';
+import patioBaseline from './assets/interactive_results/real-world/Patio/LSENeRF.mp4';
+import patioOurs from './assets/interactive_results/real-world/Patio/Ours.mp4';
+import factoryBaseline from './assets/interactive_results/synthetic/factory/LSENeRF.mp4';
+import factoryOurs from './assets/interactive_results/synthetic/factory/Ours.mp4';
+import trolleyBaseline from './assets/interactive_results/synthetic/trolley/LSENeRF.mp4';
+import trolleyOurs from './assets/interactive_results/synthetic/trolley/Ours.mp4';
+
 export const RESEARCH_DATA: ProjectData = {
   title: "AsyncEvGS: Asynchronous Event-Assisted Gaussian Splatting for Handheld Motion-Blurred Scenes",
   conference: "Conference Name 202X (Oral/Poster)",
@@ -26,18 +36,40 @@ export const RESEARCH_DATA: ProjectData = {
   methodImageUrl: pipelineImg, // Replace with your pipeline diagram URL
   comparisons: [
     {
-      id: "c1",
-      label: "Baseline Method vs Our Method",
-      imageLeft: "https://picsum.photos/seed/baseline/600/400?grayscale", // Replace with baseline result
-      imageRight: "https://picsum.photos/seed/ours/600/400", // Replace with your result
-      description: "Interactive comparison showing improvement in detail/texture/geometry."
+      id: "lounge",
+      label: "Lounge",
+      category: "Real-World",
+      scene: "Indoor lounge scene with complex lighting and reflections",
+      videoBaseline: loungeBaseline,
+      videoOurs: loungeOurs,
+      description: "Real-world indoor scene captured with handheld camera under motion blur"
     },
     {
-      id: "c2",
-      label: "Ablation: No Refinement vs Full Model",
-      imageLeft: "https://picsum.photos/seed/ablation/600/400?blur=5",
-      imageRight: "https://picsum.photos/seed/fullmodel/600/400",
-      description: "Visualizing the impact of the proposed refinement module."
+      id: "patio",
+      label: "Patio",
+      category: "Real-World",
+      scene: "Outdoor patio scene with natural lighting and vegetation",
+      videoBaseline: patioBaseline,
+      videoOurs: patioOurs,
+      description: "Real-world outdoor scene with challenging lighting conditions"
+    },
+    {
+      id: "factory",
+      label: "Factory",
+      category: "Synthetic",
+      scene: "Industrial factory environment with mechanical structures",
+      videoBaseline: factoryBaseline,
+      videoOurs: factoryOurs,
+      description: "Synthetic scene with complex geometric structures and textures"
+    },
+    {
+      id: "trolley",
+      label: "Trolley",
+      category: "Synthetic",
+      scene: "Shopping trolley scene with metallic surfaces",
+      videoBaseline: trolleyBaseline,
+      videoOurs: trolleyOurs,
+      description: "Synthetic scene featuring reflective and specular surfaces"
     }
   ],
   metrics: [

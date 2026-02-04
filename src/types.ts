@@ -14,8 +14,10 @@ export interface Link {
 export interface ComparisonItem {
   id: string;
   label: string;
-  imageLeft: string;
-  imageRight: string;
+  category: 'Real-World' | 'Synthetic';
+  scene: string;
+  videoBaseline: string;
+  videoOurs: string;
   description: string;
 }
 

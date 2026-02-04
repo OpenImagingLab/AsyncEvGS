@@ -20,9 +20,11 @@ const Icons = {
 
 // --- Components ---
 
-const ComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => {
+const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => {
   const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoLeftRef = useRef<HTMLVideoElement>(null);
+  const videoRightRef = useRef<HTMLVideoElement>(null);
 
   const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!containerRef.current) return;
@@ -33,33 +35,66 @@ const ComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => {
     setPosition(percentage);
   };
 
+  // Sync video playback
+  useEffect(() => {
+    const leftVideo = videoLeftRef.current;
+    const rightVideo = videoRightRef.current;
+    
+    if (leftVideo && rightVideo) {
+      const syncVideos = () => {
+        if (Math.abs(leftVideo.currentTime - rightVideo.currentTime) > 0.1) {
+          rightVideo.currentTime = leftVideo.currentTime;
+        }
+      };
+      
+      const handlePlay = () => rightVideo.play();
+      const handlePause = () => rightVideo.pause();
+      
+      leftVideo.addEventListener('play', handlePlay);
+      leftVideo.addEventListener('pause', handlePause);
+      leftVideo.addEventListener('seeked', syncVideos);
+      
+      return () => {
+        leftVideo.removeEventListener('play', handlePlay);
+        leftVideo.removeEventListener('pause', handlePause);
+        leftVideo.removeEventListener('seeked', syncVideos);
+      };
+    }
+  }, []);
+
   return (
-    <div className="mb-8">
-      <h3 className="text-lg font-semibold text-center mb-2">{item.label}</h3>
+    <div className="mb-4">
       <div 
         ref={containerRef}
-        className="relative w-full aspect-video rounded-xl overflow-hidden cursor-ew-resize select-none border border-slate-200 shadow-sm"
+        className="relative w-full aspect-video rounded-xl overflow-hidden cursor-ew-resize select-none border border-slate-200 shadow-lg bg-black"
         onMouseMove={(e) => e.buttons === 1 && handleMove(e)}
         onTouchMove={handleMove}
         onClick={handleMove}
       >
-        {/* Right Image (Background) */}
-        <img 
-          src={item.imageRight} 
-          alt="Right" 
+        {/* Right Video (Baseline - Background) */}
+        <video 
+          ref={videoRightRef}
+          src={item.videoBaseline}
           className="absolute inset-0 w-full h-full object-cover" 
+          loop
+          muted
+          playsInline
         />
         
-        {/* Left Image (Clipped) */}
+        {/* Left Video (Ours - Clipped) */}
         <div 
           className="absolute inset-0 w-full h-full overflow-hidden"
           style={{ width: `${position}%` }}
         >
-          <img 
-            src={item.imageLeft} 
-            alt="Left" 
-            className="absolute top-0 left-0 max-w-none h-full object-cover"
+          <video 
+            ref={videoLeftRef}
+            src={item.videoOurs}
+            className="absolute top-0 left-0 w-full h-full object-cover"
             style={{ width: containerRef.current?.offsetWidth || '100%' }} 
+            loop
+            muted
+            playsInline
+            autoPlay
           />
         </div>
 
@@ -74,10 +109,116 @@ const ComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => {
         </div>
         
         {/* Labels */}
-        <div className="absolute bottom-4 left-4 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">Previous Method</div>
-        <div className="absolute bottom-4 right-4 bg-primary/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">Ours</div>
+        <div className="absolute bottom-4 left-4 bg-black/70 text-white text-xs px-3 py-1.5 rounded backdrop-blur-sm font-medium">
+          LSE-NeRF
+        </div>
+        <div className="absolute bottom-4 right-4 bg-primary/90 text-white text-xs px-3 py-1.5 rounded backdrop-blur-sm font-medium">
+          Ours
+        </div>
       </div>
-      <p className="text-sm text-slate-500 text-center mt-2 italic">{item.description}</p>
+    </div>
+  );
+};
+
+const InteractiveResults: React.FC<{ comparisons: ComparisonItem[] }> = ({ comparisons }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentItem = comparisons[currentIndex];
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + comparisons.length) % comparisons.length);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % comparisons.length);
+  };
+
+  return (
+    <div>
+      {/* Category Tabs */}
+      <div className="flex flex-wrap justify-center gap-2 mb-6">
+        {comparisons.map((item, idx) => (
+          <button
+            key={item.id}
+            onClick={() => setCurrentIndex(idx)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              idx === currentIndex
+                ? 'bg-primary text-white shadow-md'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {item.label}
+            <span className="ml-2 text-xs opacity-75">({item.category})</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Scene Info */}
+      <div className="text-center mb-4">
+        <h3 className="text-2xl font-semibold text-slate-900 mb-2">
+          {currentItem.label}
+        </h3>
+        <p className="text-sm text-slate-500 mb-1">{currentItem.scene}</p>
+        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+          currentItem.category === 'Real-World' 
+            ? 'bg-green-100 text-green-700' 
+            : 'bg-blue-100 text-blue-700'
+        }`}>
+          {currentItem.category}
+        </span>
+      </div>
+
+      {/* Video Comparison */}
+      <div className="relative px-12">
+        <VideoComparisonSlider item={currentItem} />
+        
+        {/* Navigation Arrows */}
+        <button
+          onClick={handlePrev}
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-slate-50 transition-all hover:scale-110 border border-slate-200"
+          aria-label="Previous scene"
+        >
+          <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <button
+          onClick={handleNext}
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-slate-50 transition-all hover:scale-110 border border-slate-200"
+          aria-label="Next scene"
+        >
+          <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Description */}
+      <p className="text-sm text-slate-600 text-center mt-4 italic">
+        {currentItem.description}
+      </p>
+
+      {/* Scene Counter */}
+      <div className="flex justify-center gap-2 mt-6">
+        {comparisons.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            className={`h-2 rounded-full transition-all ${
+              idx === currentIndex ? 'bg-primary w-8' : 'bg-slate-300 w-2'
+            }`}
+            aria-label={`Go to scene ${idx + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Usage Hint */}
+      <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <p className="text-xs text-slate-600 text-center">
+          💡 <strong>Tip:</strong> Drag the slider or click anywhere on the video to compare LSE-NeRF (baseline) with our method. 
+          Videos are synchronized for direct comparison.
+        </p>
+      </div>
     </div>
   );
 };
@@ -388,14 +529,10 @@ function App() {
           </div>
         </section>
 
-        {/* Comparisons */}
+        {/* Interactive Results */}
         <section id="results" className="mb-20">
           <h2 className="font-serif text-3xl font-semibold mb-8 text-slate-900">Interactive Results</h2>
-          <div className="grid gap-12">
-            {comparisons.map(comp => (
-              <ComparisonSlider key={comp.id} item={comp} />
-            ))}
-          </div>
+          <InteractiveResults comparisons={comparisons} />
         </section>
 
         {/* Metrics */}
