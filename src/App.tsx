@@ -241,6 +241,176 @@ const InteractiveResults: React.FC<{ comparisons: ComparisonItem[] }> = ({ compa
   );
 };
 
+const PerformanceChart: React.FC<{ datasets: DatasetMetrics[] }> = ({ datasets }) => {
+  const methods = ["3DGS", "BAGS", "DeblurGS", "LSENeRF", "Ours"];
+  const methodColors: { [key: string]: string } = {
+    "3DGS": "#94a3b8",
+    "BAGS": "#fb923c",
+    "DeblurGS": "#a78bfa",
+    "LSENeRF": "#4ade80",
+    "Ours": "#2563eb"
+  };
+
+  // Get average metrics for each dataset
+  const getAverageMetrics = (dataset: DatasetMetrics) => {
+    const avgScene = dataset.scenes.find(s => s.scene === 'Average');
+    return avgScene?.methods || {};
+  };
+
+  const realWorldAvg = getAverageMetrics(datasets[0]);
+  const syntheticAvg = getAverageMetrics(datasets[1]);
+
+  // Bar chart dimensions
+  const width = 600;
+  const height = 280;
+  const padding = { top: 30, right: 20, bottom: 60, left: 50 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  // PSNR values for bar chart
+  const psnrMax = 30;
+  const barWidth = chartWidth / (methods.length * 2 + 1) * 0.8;
+  const groupWidth = chartWidth / 2;
+
+  return (
+    <div className="mb-10 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+      <h3 className="text-lg font-semibold text-slate-800 mb-2 text-center">Average PSNR Comparison</h3>
+      <p className="text-sm text-slate-500 text-center mb-4">Higher is better (↑)</p>
+      
+      <div className="overflow-x-auto">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto max-w-2xl mx-auto">
+          {/* Y-axis grid lines */}
+          {[0, 10, 20, 30].map(val => (
+            <g key={val}>
+              <line
+                x1={padding.left}
+                y1={padding.top + chartHeight - (val / psnrMax) * chartHeight}
+                x2={width - padding.right}
+                y2={padding.top + chartHeight - (val / psnrMax) * chartHeight}
+                stroke="#e2e8f0"
+                strokeDasharray={val === 0 ? "0" : "4 4"}
+              />
+              <text
+                x={padding.left - 8}
+                y={padding.top + chartHeight - (val / psnrMax) * chartHeight + 4}
+                textAnchor="end"
+                className="text-xs fill-slate-500"
+              >
+                {val}
+              </text>
+            </g>
+          ))}
+
+          {/* Y-axis label */}
+          <text
+            x={15}
+            y={height / 2}
+            textAnchor="middle"
+            transform={`rotate(-90 15 ${height / 2})`}
+            className="text-xs fill-slate-600 font-medium"
+          >
+            PSNR (dB)
+          </text>
+
+          {/* Real-World Dataset Bars */}
+          {methods.map((method, idx) => {
+            const value = realWorldAvg[method]?.psnr || 0;
+            const barHeight = (value / psnrMax) * chartHeight;
+            const x = padding.left + idx * (barWidth + 8) + 20;
+            const y = padding.top + chartHeight - barHeight;
+            
+            return (
+              <g key={`rw-${method}`}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={methodColors[method]}
+                  rx={3}
+                  className="transition-all hover:opacity-80"
+                />
+                <text
+                  x={x + barWidth / 2}
+                  y={y - 5}
+                  textAnchor="middle"
+                  className="text-xs fill-slate-700 font-medium"
+                >
+                  {value.toFixed(1)}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Synthetic Dataset Bars */}
+          {methods.map((method, idx) => {
+            const value = syntheticAvg[method]?.psnr || 0;
+            const barHeight = (value / psnrMax) * chartHeight;
+            const x = padding.left + groupWidth + idx * (barWidth + 8) + 20;
+            const y = padding.top + chartHeight - barHeight;
+            
+            return (
+              <g key={`syn-${method}`}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={methodColors[method]}
+                  rx={3}
+                  opacity={0.7}
+                  className="transition-all hover:opacity-100"
+                />
+                <text
+                  x={x + barWidth / 2}
+                  y={y - 5}
+                  textAnchor="middle"
+                  className="text-xs fill-slate-700 font-medium"
+                >
+                  {value.toFixed(1)}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Dataset Labels */}
+          <text
+            x={padding.left + groupWidth / 2}
+            y={height - 25}
+            textAnchor="middle"
+            className="text-sm fill-slate-700 font-medium"
+          >
+            Real-World (Ours)
+          </text>
+          <text
+            x={padding.left + groupWidth + groupWidth / 2}
+            y={height - 25}
+            textAnchor="middle"
+            className="text-sm fill-slate-700 font-medium"
+          >
+            Synthetic
+          </text>
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap justify-center gap-4 mt-4">
+        {methods.map(method => (
+          <div key={method} className="flex items-center gap-2">
+            <div 
+              className="w-4 h-4 rounded" 
+              style={{ backgroundColor: methodColors[method] }}
+            />
+            <span className={`text-sm ${method === 'Ours' ? 'font-semibold text-primary' : 'text-slate-600'}`}>
+              {method}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const QuantitativeTable: React.FC<{ dataset: DatasetMetrics }> = ({ dataset }) => {
   const methods = ["3DGS", "BAGS", "DeblurGS", "LSENeRF", "Ours"];
   
@@ -606,6 +776,7 @@ function App() {
             We compare our method against state-of-the-art approaches including Original 3D Gaussian Splatting, BAGS, DeblurringGS, and LSE-NeRF across two datasets. 
             Our method achieves the best performance on most scenes, with significant improvements in PSNR, SSIM, and LPIPS metrics.
           </p>
+          <PerformanceChart datasets={quantitativeResults} />
           {quantitativeResults.map((dataset, idx) => (
             <QuantitativeTable key={idx} dataset={dataset} />
           ))}
