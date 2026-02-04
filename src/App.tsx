@@ -35,12 +35,26 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
     setPosition(percentage);
   };
 
-  // Sync video playback
+  // Sync video playback - ensure both videos play together
   useEffect(() => {
     const leftVideo = videoLeftRef.current;
     const rightVideo = videoRightRef.current;
     
     if (leftVideo && rightVideo) {
+      // Start playing both videos
+      const playBoth = async () => {
+        try {
+          await Promise.all([
+            leftVideo.play(),
+            rightVideo.play()
+          ]);
+        } catch (error) {
+          console.log('Autoplay prevented, user interaction needed');
+        }
+      };
+      
+      playBoth();
+      
       const syncVideos = () => {
         if (Math.abs(leftVideo.currentTime - rightVideo.currentTime) > 0.1) {
           rightVideo.currentTime = leftVideo.currentTime;
@@ -52,12 +66,12 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
       
       leftVideo.addEventListener('play', handlePlay);
       leftVideo.addEventListener('pause', handlePause);
-      leftVideo.addEventListener('seeked', syncVideos);
+      leftVideo.addEventListener('timeupdate', syncVideos);
       
       return () => {
         leftVideo.removeEventListener('play', handlePlay);
         leftVideo.removeEventListener('pause', handlePause);
-        leftVideo.removeEventListener('seeked', syncVideos);
+        leftVideo.removeEventListener('timeupdate', syncVideos);
       };
     }
   }, []);
@@ -71,26 +85,26 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
         onTouchMove={handleMove}
         onClick={handleMove}
       >
-        {/* Right Video (Baseline - Background) */}
+        {/* Right Video (Ours - Background) */}
         <video 
           ref={videoRightRef}
-          src={item.videoBaseline}
+          src={item.videoOurs}
           className="absolute inset-0 w-full h-full object-cover" 
           loop
           muted
           playsInline
+          autoPlay
         />
         
-        {/* Left Video (Ours - Clipped) */}
+        {/* Left Video (Baseline - Clipped overlay) */}
         <div 
-          className="absolute inset-0 w-full h-full overflow-hidden"
-          style={{ width: `${position}%` }}
+          className="absolute inset-0 overflow-hidden"
+          style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         >
           <video 
             ref={videoLeftRef}
-            src={item.videoOurs}
-            className="absolute top-0 left-0 w-full h-full object-cover"
-            style={{ width: containerRef.current?.offsetWidth || '100%' }} 
+            src={item.videoBaseline}
+            className="absolute inset-0 w-full h-full object-cover"
             loop
             muted
             playsInline
@@ -100,7 +114,7 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
 
         {/* Handle */}
         <div 
-          className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+          className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize shadow-[0_0_10px_rgba(0,0,0,0.5)] z-10"
           style={{ left: `${position}%` }}
         >
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg text-slate-400">
@@ -109,10 +123,10 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
         </div>
         
         {/* Labels */}
-        <div className="absolute bottom-4 left-4 bg-black/70 text-white text-xs px-3 py-1.5 rounded backdrop-blur-sm font-medium">
-          LSE-NeRF
+        <div className="absolute bottom-4 left-4 bg-black/70 text-white text-xs px-3 py-1.5 rounded backdrop-blur-sm font-medium z-20">
+          LSE-NeRF (Baseline)
         </div>
-        <div className="absolute bottom-4 right-4 bg-primary/90 text-white text-xs px-3 py-1.5 rounded backdrop-blur-sm font-medium">
+        <div className="absolute bottom-4 right-4 bg-primary/90 text-white text-xs px-3 py-1.5 rounded backdrop-blur-sm font-medium z-20">
           Ours
         </div>
       </div>
