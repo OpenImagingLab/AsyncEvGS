@@ -7,6 +7,10 @@ import 'katex/dist/katex.min.css';
 import { RESEARCH_DATA } from './constants';
 import type { MetricPoint, ComparisonItem, ChatMessage } from './types';
 
+// Import comparison images
+import realWorldPatio from './assets/real-world-patio.png';
+import syntheticTrollet from './assets/synthetic-trollet.png';
+
 // Icons
 const Icons = {
   PDF: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
@@ -547,6 +551,36 @@ function App() {
         <section id="results" className="mb-20">
           <h2 className="font-serif text-3xl font-semibold mb-8 text-slate-900">Interactive Results</h2>
           <InteractiveResults comparisons={comparisons} />
+        </section>
+
+        {/* Qualitative Comparisons */}
+        <section className="mb-20">
+          <h2 className="font-serif text-3xl font-semibold mb-8 text-slate-900">Qualitative Comparisons</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Real-world comparison */}
+            <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+              <img 
+                src={realWorldPatio} 
+                alt="Comparison on real-world data" 
+                className="w-full h-auto"
+              />
+              <div className="p-4 text-center">
+                <p className="text-sm font-medium text-slate-700">Comparison on real-world data</p>
+              </div>
+            </div>
+
+            {/* Synthetic comparison */}
+            <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+              <img 
+                src={syntheticTrollet} 
+                alt="Comparison on synthetic data" 
+                className="w-full h-auto"
+              />
+              <div className="p-4 text-center">
+                <p className="text-sm font-medium text-slate-700">Comparison on synthetic data</p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Metrics */}
