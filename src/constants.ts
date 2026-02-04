@@ -42,7 +42,7 @@ export const RESEARCH_DATA: ProjectData = {
       scene: "Indoor lounge scene with complex lighting and reflections",
       videoBaseline: loungeBaseline,
       videoOurs: loungeOurs,
-      description: "Real-world indoor scene captured with handheld camera under motion blur"
+      description: "Our method demonstrates superior preservation and reconstruction of fine details and high-frequency textures compared to the baseline approach."
     },
     {
       id: "patio",
@@ -51,7 +51,7 @@ export const RESEARCH_DATA: ProjectData = {
       scene: "Outdoor patio scene with natural lighting and vegetation",
       videoBaseline: patioBaseline,
       videoOurs: patioOurs,
-      description: "Real-world outdoor scene with challenging lighting conditions"
+      description: "Our method demonstrates superior preservation and reconstruction of fine details and high-frequency textures compared to the baseline approach."
     },
     {
       id: "factory",
@@ -60,7 +60,7 @@ export const RESEARCH_DATA: ProjectData = {
       scene: "Industrial factory environment with mechanical structures",
       videoBaseline: factoryBaseline,
       videoOurs: factoryOurs,
-      description: "Synthetic scene with complex geometric structures and textures"
+      description: "Our method demonstrates superior preservation and reconstruction of fine details and high-frequency textures compared to the baseline approach."
     },
     {
       id: "trolley",
@@ -69,7 +69,7 @@ export const RESEARCH_DATA: ProjectData = {
       scene: "Shopping trolley scene with metallic surfaces",
       videoBaseline: trolleyBaseline,
       videoOurs: trolleyOurs,
-      description: "Synthetic scene featuring reflective and specular surfaces"
+      description: "Our method demonstrates superior preservation and reconstruction of fine details and high-frequency textures compared to the baseline approach."
     }
   ],
   metrics: [
