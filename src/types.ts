@@ -28,6 +28,28 @@ export interface MetricPoint {
   lpips: number;
 }
 
+export interface SceneMetrics {
+  scene: string;
+  methods: {
+    [method: string]: {
+      psnr: number;
+      ssim: number;
+      lpips: number;
+    };
+  };
+  best: {
+    psnr: string;
+    ssim: string;
+    lpips: string;
+  };
+}
+
+export interface DatasetMetrics {
+  name: string;
+  caption: string;
+  scenes: SceneMetrics[];
+}
+
 export interface ProjectData {
   title: string;
   conference?: string;
@@ -38,8 +60,7 @@ export interface ProjectData {
   methodDescription: string;
   methodImageUrl: string;
   comparisons: ComparisonItem[];
-  metrics: MetricPoint[];
-}
+  metrics: MetricPoint[];  quantitativeResults: DatasetMetrics[];}
 
 export interface ChatMessage {
   role: 'user' | 'model';

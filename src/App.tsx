@@ -5,7 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { RESEARCH_DATA } from './constants';
-import type { MetricPoint, ComparisonItem, ChatMessage } from './types';
+import type { ComparisonItem, ChatMessage, DatasetMetrics } from './types';
 
 // Import comparison images
 import realWorldPatio from './assets/real-world-patio.png';
@@ -241,61 +241,81 @@ const InteractiveResults: React.FC<{ comparisons: ComparisonItem[] }> = ({ compa
   );
 };
 
-const MetricsChart: React.FC<{ data: MetricPoint[] }> = ({ data }) => {
-  const maxEpoch = Math.max(...data.map(d => d.epoch));
-  const maxPSNR = Math.max(...data.map(d => d.psnr)) * 1.1;
-
-  // Simple SVG Line Chart
-  const width = 600;
-  const height = 300;
-  const padding = 40;
+const QuantitativeTable: React.FC<{ dataset: DatasetMetrics }> = ({ dataset }) => {
+  const methods = ["3DGS", "BAGS", "DeblurGS", "LSENeRF", "Ours"];
   
-  const xScale = (val: number) => padding + (val / maxEpoch) * (width - 2 * padding);
-  const yScale = (val: number) => height - padding - (val / maxPSNR) * (height - 2 * padding);
-
-  const points = data.map(d => `${xScale(d.epoch)},${yScale(d.psnr)}`).join(' ');
+  const getCellClass = (scene: typeof dataset.scenes[0], method: string, metric: 'psnr' | 'ssim' | 'lpips') => {
+    const isBest = scene.best[metric] === method;
+    if (!isBest) return "";
+    
+    switch (metric) {
+      case 'psnr': return 'bg-blue-100 text-blue-800 font-bold';
+      case 'ssim': return 'bg-yellow-100 text-yellow-800 font-bold';
+      case 'lpips': return 'bg-green-100 text-green-800 font-bold';
+    }
+  };
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="min-w-[500px]">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto font-sans text-xs">
-          {/* Grid lines */}
-          {[0, 0.25, 0.5, 0.75, 1].map(t => (
-            <line 
-              key={t}
-              x1={padding} 
-              y1={height - padding - t * (height - 2 * padding)} 
-              x2={width - padding} 
-              y2={height - padding - t * (height - 2 * padding)} 
-              stroke="#e2e8f0" 
-              strokeDasharray="4 4" 
-            />
-          ))}
-
-          {/* Axes */}
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#94a3b8" />
-          <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#94a3b8" />
-
-          {/* Line */}
-          <polyline points={points} fill="none" stroke="#2563eb" strokeWidth="3" />
-          
-          {/* Points */}
-          {data.map((d, i) => (
-            <circle 
-              key={i} 
-              cx={xScale(d.epoch)} 
-              cy={yScale(d.psnr)} 
-              r="4" 
-              fill="white" 
-              stroke="#2563eb" 
-              strokeWidth="2" 
-            />
-          ))}
-
-          {/* Labels */}
-          <text x={width/2} y={height - 5} textAnchor="middle" fill="#64748b">Training Epochs</text>
-          <text x={15} y={height/2} textAnchor="middle" transform={`rotate(-90 15 ${height/2})`} fill="#64748b">PSNR (dB)</text>
-        </svg>
+    <div className="mb-10">
+      <h3 className="text-lg font-semibold text-slate-800 mb-2">{dataset.name}</h3>
+      <p className="text-sm text-slate-600 mb-4">{dataset.caption}</p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-slate-300">
+              <th className="text-left py-3 px-2 font-semibold text-slate-700">Scene</th>
+              {methods.map(method => (
+                <th key={method} colSpan={3} className="text-center py-3 px-1 font-semibold text-slate-700 border-l border-slate-200">
+                  {method === "Ours" ? <span className="text-primary">{method}</span> : method}
+                </th>
+              ))}
+            </tr>
+            <tr className="border-b border-slate-200 text-xs text-slate-500">
+              <th></th>
+              {methods.map(method => (
+                <React.Fragment key={method}>
+                  <th className="py-2 px-1 font-medium border-l border-slate-200">PSNR↑</th>
+                  <th className="py-2 px-1 font-medium">SSIM↑</th>
+                  <th className="py-2 px-1 font-medium">LPIPS↓</th>
+                </React.Fragment>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {dataset.scenes.map((scene, idx) => (
+              <tr 
+                key={scene.scene} 
+                className={`border-b border-slate-100 ${scene.scene === 'Average' ? 'bg-slate-50 font-medium' : ''} ${idx % 2 === 0 ? '' : 'bg-slate-50/50'}`}
+              >
+                <td className="py-2 px-2 text-slate-700">{scene.scene}</td>
+                {methods.map(method => (
+                  <React.Fragment key={method}>
+                    <td className={`py-2 px-1 text-center border-l border-slate-200 ${getCellClass(scene, method, 'psnr')}`}>
+                      {scene.methods[method].psnr.toFixed(2)}
+                    </td>
+                    <td className={`py-2 px-1 text-center ${getCellClass(scene, method, 'ssim')}`}>
+                      {scene.methods[method].ssim.toFixed(3)}
+                    </td>
+                    <td className={`py-2 px-1 text-center ${getCellClass(scene, method, 'lpips')}`}>
+                      {scene.methods[method].lpips.toFixed(3)}
+                    </td>
+                  </React.Fragment>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-wrap gap-4 mt-3 text-xs text-slate-500">
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-3 bg-blue-100 rounded"></span> Best PSNR
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-3 bg-yellow-100 rounded"></span> Best SSIM
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-3 bg-green-100 rounded"></span> Best LPIPS
+        </span>
       </div>
     </div>
   );
@@ -434,7 +454,7 @@ const ChatWidget: React.FC = () => {
 // --- Main App ---
 
 function App() {
-  const { title, conference, authors, abstract, links, heroVideoUrl, methodDescription, methodImageUrl, comparisons, metrics } = RESEARCH_DATA;
+  const { title, conference, authors, abstract, links, heroVideoUrl, methodDescription, methodImageUrl, comparisons, quantitativeResults } = RESEARCH_DATA;
 
   return (
     <div className="min-h-screen pb-20">
@@ -582,23 +602,13 @@ function App() {
         {/* Metrics */}
         <section className="mb-20">
           <h2 className="font-serif text-3xl font-semibold mb-8 text-slate-900">Quantitative Metrics</h2>
-          <div className="flex flex-col md:flex-row gap-8 items-center">
-            <div className="flex-1 w-full bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="text-lg font-medium mb-4 text-center">PSNR over Training Epochs</h3>
-              <MetricsChart data={metrics} />
-            </div>
-            <div className="flex-1 text-slate-600 space-y-4">
-              <p>
-                Our model demonstrates rapid convergence, achieving a <strong>PSNR of {metrics[metrics.length-1].psnr}dB</strong> by epoch 50. 
-                The combination of our novel loss function and the initialized Gaussian field significantly accelerates the training process compared to baseline NeRF methods.
-              </p>
-              <ul className="list-disc list-inside space-y-2 marker:text-primary">
-                <li>Higher PSNR indicates better reconstruction quality.</li>
-                <li>Lower LPIPS scores (not plotted) confirm perceptual fidelity.</li>
-                <li>Consistent performance across diverse datasets.</li>
-              </ul>
-            </div>
-          </div>
+          <p className="text-slate-600 mb-6">
+            We compare our method against state-of-the-art approaches including Original 3D Gaussian Splatting, BAGS, DeblurringGS, and LSE-NeRF across two datasets. 
+            Our method achieves the best performance on most scenes, with significant improvements in PSNR, SSIM, and LPIPS metrics.
+          </p>
+          {quantitativeResults.map((dataset, idx) => (
+            <QuantitativeTable key={idx} dataset={dataset} />
+          ))}
         </section>
 
         {/* Citation */}
