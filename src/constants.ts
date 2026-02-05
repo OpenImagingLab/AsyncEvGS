@@ -1,6 +1,6 @@
 import type { ProjectData } from './types';
 import pipelineImg from './assets/pipeline_v7.png';
-import heroVideo from './assets/AsyncEvGS_supp.mp4';
+import heroVideo from './assets/AsyncEvGS_supp_small.mp4';
 
 // Import videos
 import loungeBaseline from './assets/interactive_results/real-world/Lounge/LSENeRF.mp4';
