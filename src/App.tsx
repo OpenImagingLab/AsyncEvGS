@@ -260,150 +260,154 @@ const PerformanceChart: React.FC<{ datasets: DatasetMetrics[] }> = ({ datasets }
   const realWorldAvg = getAverageMetrics(datasets[0]);
   const syntheticAvg = getAverageMetrics(datasets[1]);
 
-  // Bar chart dimensions
-  const width = 600;
-  const height = 250;
-  const padding = { top: 30, right: 20, bottom: 50, left: 50 };
+  // Fixed chart dimensions - same for all charts
+  const width = 700;
+  const height = 220;
+  const padding = { top: 25, right: 30, bottom: 45, left: 55 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
-  const barWidth = chartWidth / (methods.length * 2 + 1) * 0.8;
-  const groupWidth = chartWidth / 2;
+  const barWidth = 42;
+  const barGap = 10;
+  const groupGap = 60;
 
   // Chart configurations for each metric
   const metrics = [
-    { key: 'psnr' as const, label: 'PSNR (dB)', max: 30, gridLines: [0, 10, 20, 30], higherBetter: true },
-    { key: 'ssim' as const, label: 'SSIM', max: 1, gridLines: [0, 0.25, 0.5, 0.75, 1.0], higherBetter: true },
-    { key: 'lpips' as const, label: 'LPIPS', max: 0.6, gridLines: [0, 0.2, 0.4, 0.6], higherBetter: false }
+    { key: 'psnr' as const, label: 'PSNR (dB)', max: 30, gridLines: [0, 10, 20, 30], higherBetter: true, decimals: 1 },
+    { key: 'ssim' as const, label: 'SSIM', max: 1, gridLines: [0, 0.25, 0.5, 0.75, 1.0], higherBetter: true, decimals: 3 },
+    { key: 'lpips' as const, label: 'LPIPS', max: 0.6, gridLines: [0, 0.2, 0.4, 0.6], higherBetter: false, decimals: 3 }
   ];
 
-  const renderChart = (metric: typeof metrics[0]) => (
-    <div key={metric.key} className="flex-1 min-w-[280px]">
-      <h4 className="text-base font-semibold text-slate-800 mb-1 text-center">{metric.label}</h4>
-      <p className="text-xs text-slate-500 text-center mb-3">
-        {metric.higherBetter ? 'Higher is better (↑)' : 'Lower is better (↓)'}
-      </p>
-      
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
-        {/* Y-axis grid lines */}
-        {metric.gridLines.map(val => (
-          <g key={val}>
-            <line
-              x1={padding.left}
-              y1={padding.top + chartHeight - (val / metric.max) * chartHeight}
-              x2={width - padding.right}
-              y2={padding.top + chartHeight - (val / metric.max) * chartHeight}
-              stroke="#e2e8f0"
-              strokeDasharray={val === 0 ? "0" : "4 4"}
-            />
-            <text
-              x={padding.left - 8}
-              y={padding.top + chartHeight - (val / metric.max) * chartHeight + 4}
-              textAnchor="end"
-              className="text-xs fill-slate-500"
-              style={{ fontSize: '10px' }}
-            >
-              {metric.key === 'psnr' ? val : val.toFixed(2)}
-            </text>
-          </g>
-        ))}
+  const renderChart = (metric: typeof metrics[0]) => {
+    const groupWidth = methods.length * (barWidth + barGap);
+    const totalWidth = groupWidth * 2 + groupGap;
+    const startX = padding.left + (chartWidth - totalWidth) / 2;
 
-        {/* Real-World Dataset Bars */}
-        {methods.map((method, idx) => {
-          const value = realWorldAvg[method]?.[metric.key] || 0;
-          const barHeight = (value / metric.max) * chartHeight;
-          const x = padding.left + idx * (barWidth + 8) + 20;
-          const y = padding.top + chartHeight - barHeight;
-          
-          return (
-            <g key={`rw-${method}`}>
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                fill={methodColors[method]}
-                rx={3}
-                className="transition-all hover:opacity-80"
+    return (
+      <div key={metric.key} className="w-full">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <h4 className="text-base font-semibold text-slate-800">{metric.label}</h4>
+          <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+            {metric.higherBetter ? '↑ Higher is better' : '↓ Lower is better'}
+          </span>
+        </div>
+        
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto max-w-3xl mx-auto">
+          {/* Y-axis grid lines */}
+          {metric.gridLines.map(val => (
+            <g key={val}>
+              <line
+                x1={padding.left}
+                y1={padding.top + chartHeight - (val / metric.max) * chartHeight}
+                x2={width - padding.right}
+                y2={padding.top + chartHeight - (val / metric.max) * chartHeight}
+                stroke="#e2e8f0"
+                strokeDasharray={val === 0 ? "0" : "4 4"}
               />
               <text
-                x={x + barWidth / 2}
-                y={y - 4}
-                textAnchor="middle"
-                className="fill-slate-700 font-medium"
-                style={{ fontSize: '9px' }}
+                x={padding.left - 10}
+                y={padding.top + chartHeight - (val / metric.max) * chartHeight + 4}
+                textAnchor="end"
+                className="fill-slate-500"
+                style={{ fontSize: '11px' }}
               >
-                {metric.key === 'psnr' ? value.toFixed(1) : value.toFixed(3)}
+                {metric.decimals === 1 ? val : val.toFixed(2)}
               </text>
             </g>
-          );
-        })}
+          ))}
 
-        {/* Synthetic Dataset Bars */}
-        {methods.map((method, idx) => {
-          const value = syntheticAvg[method]?.[metric.key] || 0;
-          const barHeight = (value / metric.max) * chartHeight;
-          const x = padding.left + groupWidth + idx * (barWidth + 8) + 20;
-          const y = padding.top + chartHeight - barHeight;
-          
-          return (
-            <g key={`syn-${method}`}>
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                fill={methodColors[method]}
-                rx={3}
-                opacity={0.7}
-                className="transition-all hover:opacity-100"
-              />
-              <text
-                x={x + barWidth / 2}
-                y={y - 4}
-                textAnchor="middle"
-                className="fill-slate-700 font-medium"
-                style={{ fontSize: '9px' }}
-              >
-                {metric.key === 'psnr' ? value.toFixed(1) : value.toFixed(3)}
-              </text>
-            </g>
-          );
-        })}
+          {/* Real-World Dataset Bars */}
+          {methods.map((method, idx) => {
+            const value = realWorldAvg[method]?.[metric.key] || 0;
+            const barHeight = (value / metric.max) * chartHeight;
+            const x = startX + idx * (barWidth + barGap);
+            const y = padding.top + chartHeight - barHeight;
+            
+            return (
+              <g key={`rw-${method}`}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={methodColors[method]}
+                  rx={4}
+                  className="transition-all hover:opacity-80"
+                />
+                <text
+                  x={x + barWidth / 2}
+                  y={y - 5}
+                  textAnchor="middle"
+                  className="fill-slate-700 font-medium"
+                  style={{ fontSize: '10px' }}
+                >
+                  {value.toFixed(metric.decimals)}
+                </text>
+              </g>
+            );
+          })}
 
-        {/* Dataset Labels */}
-        <text
-          x={padding.left + groupWidth / 2}
-          y={height - 15}
-          textAnchor="middle"
-          className="fill-slate-700 font-medium"
-          style={{ fontSize: '11px' }}
-        >
-          Real-World
-        </text>
-        <text
-          x={padding.left + groupWidth + groupWidth / 2}
-          y={height - 15}
-          textAnchor="middle"
-          className="fill-slate-700 font-medium"
-          style={{ fontSize: '11px' }}
-        >
-          Synthetic
-        </text>
-      </svg>
-    </div>
-  );
+          {/* Synthetic Dataset Bars */}
+          {methods.map((method, idx) => {
+            const value = syntheticAvg[method]?.[metric.key] || 0;
+            const barHeight = (value / metric.max) * chartHeight;
+            const x = startX + groupWidth + groupGap + idx * (barWidth + barGap);
+            const y = padding.top + chartHeight - barHeight;
+            
+            return (
+              <g key={`syn-${method}`}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={methodColors[method]}
+                  rx={4}
+                  opacity={0.75}
+                  className="transition-all hover:opacity-100"
+                />
+                <text
+                  x={x + barWidth / 2}
+                  y={y - 5}
+                  textAnchor="middle"
+                  className="fill-slate-700 font-medium"
+                  style={{ fontSize: '10px' }}
+                >
+                  {value.toFixed(metric.decimals)}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Dataset Labels */}
+          <text
+            x={startX + groupWidth / 2}
+            y={height - 12}
+            textAnchor="middle"
+            className="fill-slate-700 font-medium"
+            style={{ fontSize: '12px' }}
+          >
+            Real-World
+          </text>
+          <text
+            x={startX + groupWidth + groupGap + groupWidth / 2}
+            y={height - 12}
+            textAnchor="middle"
+            className="fill-slate-700 font-medium"
+            style={{ fontSize: '12px' }}
+          >
+            Synthetic
+          </text>
+        </svg>
+      </div>
+    );
+  };
 
   return (
     <div className="mb-10 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
       <h3 className="text-lg font-semibold text-slate-800 mb-6 text-center">Average Performance Comparison</h3>
       
-      {/* Three charts side by side */}
-      <div className="flex flex-wrap justify-center gap-4">
-        {metrics.map(renderChart)}
-      </div>
-
-      {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-4 mt-6 pt-4 border-t border-slate-100">
+      {/* Legend at top */}
+      <div className="flex flex-wrap justify-center gap-4 mb-6">
         {methods.map(method => (
           <div key={method} className="flex items-center gap-2">
             <div 
@@ -415,6 +419,11 @@ const PerformanceChart: React.FC<{ datasets: DatasetMetrics[] }> = ({ datasets }
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Three charts stacked vertically with same size */}
+      <div className="space-y-8">
+        {metrics.map(renderChart)}
       </div>
     </div>
   );
