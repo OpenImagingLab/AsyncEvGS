@@ -26,6 +26,7 @@ const Icons = {
 
 const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => {
   const [position, setPosition] = useState(50);
+  const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoLeftRef = useRef<HTMLVideoElement>(null);
   const videoRightRef = useRef<HTMLVideoElement>(null);
@@ -39,12 +40,21 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
     setPosition(percentage);
   };
 
+  // Reset loading state when item changes
+  useEffect(() => {
+    setIsLoading(true);
+  }, [item.id]);
+
   // Sync video playback - ensure both videos play together
   useEffect(() => {
     const leftVideo = videoLeftRef.current;
     const rightVideo = videoRightRef.current;
     
     if (leftVideo && rightVideo) {
+      // Reset videos when item changes
+      leftVideo.load();
+      rightVideo.load();
+      
       // Start playing both videos
       const playBoth = async () => {
         try {
@@ -52,12 +62,27 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
             leftVideo.play(),
             rightVideo.play()
           ]);
+          setIsLoading(false);
         } catch (error) {
           console.log('Autoplay prevented, user interaction needed');
+          setIsLoading(false);
         }
       };
       
-      playBoth();
+      // Wait for both videos to be ready
+      const handleCanPlay = () => {
+        if (leftVideo.readyState >= 3 && rightVideo.readyState >= 3) {
+          playBoth();
+        }
+      };
+      
+      leftVideo.addEventListener('canplay', handleCanPlay);
+      rightVideo.addEventListener('canplay', handleCanPlay);
+      
+      // Try to play immediately if already loaded
+      if (leftVideo.readyState >= 3 && rightVideo.readyState >= 3) {
+        playBoth();
+      }
       
       const syncVideos = () => {
         if (Math.abs(leftVideo.currentTime - rightVideo.currentTime) > 0.1) {
@@ -73,12 +98,14 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
       leftVideo.addEventListener('timeupdate', syncVideos);
       
       return () => {
+        leftVideo.removeEventListener('canplay', handleCanPlay);
+        rightVideo.removeEventListener('canplay', handleCanPlay);
         leftVideo.removeEventListener('play', handlePlay);
         leftVideo.removeEventListener('pause', handlePause);
         leftVideo.removeEventListener('timeupdate', syncVideos);
       };
     }
-  }, []);
+  }, [item.id]);
 
   return (
     <div className="mb-4">
@@ -89,15 +116,23 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
         onTouchMove={handleMove}
         onClick={handleMove}
       >
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center z-30 bg-black/50">
+            <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+
         {/* Right Video (Ours - Background) */}
         <video 
+          key={`ours-${item.id}`}
           ref={videoRightRef}
           src={item.videoOurs}
           className="absolute inset-0 w-full h-full object-cover" 
           loop
           muted
           playsInline
-          autoPlay
+          preload="auto"
         />
         
         {/* Left Video (Baseline - Clipped overlay) */}
@@ -106,13 +141,14 @@ const VideoComparisonSlider: React.FC<{ item: ComparisonItem }> = ({ item }) => 
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         >
           <video 
+            key={`baseline-${item.id}`}
             ref={videoLeftRef}
             src={item.videoBaseline}
             className="absolute inset-0 w-full h-full object-cover"
             loop
             muted
             playsInline
-            autoPlay
+            preload="auto"
           />
         </div>
 
