@@ -1,5 +1,6 @@
 import type { ProjectData } from './types';
 import pipelineImg from './assets/pipeline_v7.png';
+import heroVideo from './assets/AsyncEvGS_supp.mp4';
 
 // Import videos
 import loungeBaseline from './assets/interactive_results/real-world/Lounge/LSENeRF.mp4';
@@ -31,7 +32,7 @@ export const RESEARCH_DATA: ProjectData = {
     { label: "Video", url: "#", icon: "youtube" },
     { label: "Dataset", url: "#", icon: "database" }
   ],
-  heroVideoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Replace with your project's teaser video URL
+  heroVideoUrl: heroVideo,
   methodDescription: `An overview of our proposed reconstruction pipeline. Our method takes blurred RGB images and sharp event streams as input. We first employ VGGT [1] to process both RGB and event images, providing robust initial camera poses and 3DGS points. The 3DGS representation is then jointly optimized using five key losses, broadly categorized into three groups: **(1) Deblurring Losses:** The blur synthesis loss ($\\mathcal{L}_{\\text{blur}}$) matches the synthesized blur to the input, while an RGB consistency regularizer ($\\mathcal{L}_{\\text{reg-r}}$) prevents degradation of the sharp neighboring views. **(2) Event-Guided Losses:** We augment the traditional photometric loss ($\\mathcal{L}_{\\text{evs}}$), with our novel structure loss ($\\mathcal{L}_{\\text{struct}}$) to robustly leverage high-frequency event details. **(3) Consistency Loss ($\\mathcal{L}_{\\text{reg-e}}$):** A color distillation loss ensures that event views match the colors learned from a coarse (Stage 1) 3DGS copy.`,
   methodImageUrl: pipelineImg, // Replace with your pipeline diagram URL
   comparisons: [
