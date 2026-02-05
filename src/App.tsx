@@ -705,14 +705,13 @@ function App() {
 
         {/* Hero Video */}
         <section className="mb-20 rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-black aspect-video">
-           {/* In a real scenario, use <video src={heroVideoUrl} ... /> */}
-           {/* Using iframe for demo video compatibility */}
            <video 
              className="w-full h-full object-cover" 
              autoPlay 
              loop 
              muted 
              playsInline
+             controls
              poster={methodImageUrl}
            >
              <source src={heroVideoUrl} type="video/mp4" />
