@@ -1,6 +1,6 @@
 import type { ProjectData } from './types';
 import pipelineImg from './assets/pipeline_v7.png';
-import heroVideo from './assets/AsyncEvGS_supp_small.mp4';
+import heroVideo from './assets/teaser_video.mp4';
 
 // Import videos
 import loungeBaseline from './assets/interactive_results/real-world/Lounge/LSENeRF.mp4';
@@ -14,14 +14,14 @@ import trolleyOurs from './assets/interactive_results/synthetic/trolley/Ours.mp4
 
 export const RESEARCH_DATA: ProjectData = {
   title: "AsyncEvGS: Asynchronous Event-Assisted Gaussian Splatting for Handheld Motion-Blurred Scenes",
-  conference: "Conference Name 202X (Oral/Poster)",
+  conference: "arXiv2026",
   authors: [
-    { name: "Jun Dai", affiliation: "Shanghai AI Laboratory", url: "https://daijun10086.github.io/", isEqualContribution: false },
-    { name: "Renbiao Jin", affiliation: "Shanghai Jiaotong University", url: "#", isEqualContribution: false },
+    { name: "Jun Dai", affiliation: "Shanghai AI Laboratory", url: "https://daijun10086.github.io/", isEqualContribution: true },
+    { name: "Renbiao Jin", affiliation: "Shanghai Jiaotong University", url: "#", isEqualContribution: true },
     { name: "Bo Xu", affiliation: "Shanghai Jiaotong University", url: "#" },
     { name: "Yutian Chen", affiliation: "CUHK", url: "#" },
     { name: "Linning Xu", affiliation: "CUHK", url: "#" },
-    { name: "Mulin Xu", affiliation: "Shanghai AI Laboratory", url: "#" },
+    { name: "Mulin Yu", affiliation: "Shanghai AI Laboratory", url: "#" },
     { name: "Tianfan Xue", affiliation: "CUHK", url: "#" },
     { name: "Shi Guo", affiliation: "Shanghai AI Laboratory", url: "#" }
   ],

@@ -839,14 +839,7 @@ function App() {
         <section id="citation" className="mb-24">
           <h2 className="font-serif text-3xl font-semibold mb-6 text-slate-900">Citation</h2>
           <div className="bg-slate-800 text-slate-200 p-6 rounded-xl font-mono text-sm overflow-x-auto shadow-inner">
-            <pre className="whitespace-pre">
-{`@inproceedings{rivera2025chronos,
-  title={${title}},
-  author={Rivera, Alex and Chen, Sarah and Wei, James and Garcia, Maria},
-  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year={2025}
-}`}
-            </pre>
+            <pre className="whitespace-pre"></pre>
           </div>
         </section>
       </main>
