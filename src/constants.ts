@@ -19,11 +19,11 @@ export const RESEARCH_DATA: ProjectData = {
     { name: "Jun Dai",     affiliations: [1],       url: "https://daijun10086.github.io/", isEqualContribution: true },
     { name: "Renbiao Jin", affiliations: [2],       url: "#", isEqualContribution: true },
     { name: "Bo Xu",       affiliations: [2],       url: "#" },
-    { name: "Yutian Chen", affiliations: [3],       url: "#" },
-    { name: "Linning Xu", affiliations: [3],        url: "#" },
-    { name: "Mulin Yu",    affiliations: [1],       url: "#" },
-    { name: "Tianfan Xue", affiliations: [3, 1, 4], url: "#", isCorresponding: true },
-    { name: "Shi Guo",     affiliations: [1],       url: "#", isCorresponding: true }
+    { name: "Yutian Chen", affiliations: [3],       url: "https://yutian10.github.io/" },
+    { name: "Linning Xu", affiliations: [3],        url: "https://eveneveno.github.io/lnxu/" },
+    { name: "Mulin Yu",    affiliations: [1],       url: "https://mulinyu.github.io/" },
+    { name: "Tianfan Xue", affiliations: [3, 1, 4], url: "https://tianfan.info/", isCorresponding: true },
+    { name: "Shi Guo",     affiliations: [1],       url: "https://guoshi28.github.io/", isCorresponding: true }
   ],
   institutions: [
     "Shanghai AI Laboratory",
