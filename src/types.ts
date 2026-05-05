@@ -1,8 +1,9 @@
 export interface Author {
   name: string;
-  affiliation?: string;
+  affiliations: number[];
   url?: string;
   isEqualContribution?: boolean;
+  isCorresponding?: boolean;
 }
 
 export interface Link {
@@ -54,6 +55,8 @@ export interface ProjectData {
   title: string;
   conference?: string;
   authors: Author[];
+  institutions: string[];
+  contactEmails?: string[];
   abstract: string;
   links: Link[];
   heroVideoUrl: string; // Placeholder for video URL

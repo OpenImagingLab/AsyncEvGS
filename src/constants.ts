@@ -16,15 +16,22 @@ export const RESEARCH_DATA: ProjectData = {
   title: "AsyncEvGS: Asynchronous Event-Assisted Gaussian Splatting for Handheld Motion-Blurred Scenes",
   conference: "arXiv2026",
   authors: [
-    { name: "Jun Dai", affiliation: "Shanghai AI Laboratory", url: "https://daijun10086.github.io/", isEqualContribution: true },
-    { name: "Renbiao Jin", affiliation: "Shanghai Jiaotong University", url: "#", isEqualContribution: true },
-    { name: "Bo Xu", affiliation: "Shanghai Jiaotong University", url: "#" },
-    { name: "Yutian Chen", affiliation: "CUHK", url: "#" },
-    { name: "Linning Xu", affiliation: "CUHK", url: "#" },
-    { name: "Mulin Yu", affiliation: "Shanghai AI Laboratory", url: "#" },
-    { name: "Tianfan Xue", affiliation: "CUHK", url: "#" },
-    { name: "Shi Guo", affiliation: "Shanghai AI Laboratory", url: "#" }
+    { name: "Jun Dai",     affiliations: [1],       url: "https://daijun10086.github.io/", isEqualContribution: true },
+    { name: "Renbiao Jin", affiliations: [2],       url: "#", isEqualContribution: true },
+    { name: "Bo Xu",       affiliations: [2],       url: "#" },
+    { name: "Yutian Chen", affiliations: [3],       url: "#" },
+    { name: "Linning Xu", affiliations: [3],        url: "#" },
+    { name: "Mulin Yu",    affiliations: [1],       url: "#" },
+    { name: "Tianfan Xue", affiliations: [3, 1, 4], url: "#", isCorresponding: true },
+    { name: "Shi Guo",     affiliations: [1],       url: "#", isCorresponding: true }
   ],
+  institutions: [
+    "Shanghai AI Laboratory",
+    "Shanghai Jiao Tong University",
+    "CUHK MMLab",
+    "CPII under InnoHK"
+  ],
+  contactEmails: ["jundai332@gmail.com", "guoshi@pjlab.org.cn"],
   abstract: `3D reconstruction methods such as 3D Gaussian Splatting (3DGS) and Neural Radiance Fields (NeRF) achieve impressive photorealism but fail when input images suffer from severe motion blur. While event cameras provide high-temporal-resolution motion cues, existing event-assisted approaches rely on low-resolution sensors and strict synchronization, limiting their practicality for handheld 3D capture on common devices, such as smartphones. We introduce a flexible, high-resolution asynchronous RGB–Event dual-camera system and a corresponding reconstruction framework. Our approach first reconstructs sharp images from the event data and then employs a cross-domain pose estimation module based on the Visual Geometry Transformer (VGGT) to obtain robust initialization for 3DGS. During optimization, we employ a structure-driven event loss and view-specific consistency regularizers to mitigate the ill-posed behavior of traditional event losses and deblurring losses, ensuring both stable and high-fidelity reconstruction. We further contribute AsyncEv-Deblur, a new high-resolution RGB–Event dataset captured with our asynchronous system. Experiments demonstrate that our method achieves state-of-the-art performance on both our challenging dataset and existing benchmarks, substantially improving reconstruction robustness under severe motion blur.`,
   links: [
     { label: "Paper", url: "#", icon: "pdf" },

@@ -678,7 +678,9 @@ const ChatWidget: React.FC = () => {
 // --- Main App ---
 
 function App() {
-  const { title, conference, authors, abstract, links, heroVideoUrl, methodDescription, methodImageUrl, comparisons, quantitativeResults } = RESEARCH_DATA;
+  const { title, conference, authors, institutions, contactEmails, abstract, links, heroVideoUrl, methodDescription, methodImageUrl, comparisons, quantitativeResults } = RESEARCH_DATA;
+  const hasEqual = authors.some(a => a.isEqualContribution);
+  const hasCorr = authors.some(a => a.isCorresponding);
 
   return (
     <div className="min-h-screen pb-20">
@@ -710,17 +712,46 @@ function App() {
             </div>
           )}
 
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mb-8 text-lg">
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-lg">
             {authors.map((author, idx) => (
-              <div key={idx} className="group relative">
-                <a href={author.url} className="text-slate-700 hover:text-primary transition-colors">
+              <div key={idx} className="text-slate-700">
+                <a href={author.url} className="hover:text-primary transition-colors">
                   {author.name}
-                  {author.isEqualContribution && <span className="text-slate-400 ml-1">*</span>}
                 </a>
-                <span className="block text-sm text-slate-500">{author.affiliation}</span>
+                <sup className="text-slate-500 ml-0.5">
+                  {author.affiliations.join(',')}
+                  {author.isEqualContribution && '*'}
+                  {author.isCorresponding && '†'}
+                </sup>
               </div>
             ))}
           </div>
+
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 mb-2 text-sm text-slate-500 max-w-3xl mx-auto">
+            {institutions.map((inst, idx) => (
+              <span key={idx}>
+                <sup>{idx + 1}</sup>{inst}
+              </span>
+            ))}
+          </div>
+
+          {(hasEqual || hasCorr) && (
+            <div className="text-sm text-slate-500 mb-2">
+              {hasEqual && <span className="mr-4"><sup>*</sup>Equal contribution.</span>}
+              {hasCorr && <span><sup>{'†'}</sup>Corresponding author.</span>}
+            </div>
+          )}
+
+          {contactEmails && contactEmails.length > 0 && (
+            <div className="text-sm text-slate-500 mb-8">
+              {contactEmails.map((email, idx) => (
+                <span key={idx}>
+                  {idx > 0 && ', '}
+                  <a href={`mailto:${email}`} className="hover:text-primary transition-colors">{email}</a>
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="flex flex-wrap justify-center gap-4">
             {links.map((link, idx) => (
